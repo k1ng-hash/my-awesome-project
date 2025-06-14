@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crimson Trials</title>
+    <style>
+        :root {
+            --blood-red: #8B0000;
+            --dark-red: #5E0000;
+            --light-red: #FF3333;
+            --black: #121212;
+            --dark-gray: #222;
+            --gray: #444;
+            --light-gray: #DDD;
+            --white: #F5F5F5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cinzel Decorative', cursive, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap');
+
+        body {
+            background-color: var(--black);
+            color: var(--light-gray);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="rgba(139, 0, 0, 0.05)" width="50" height="50" x="0" y="0"></rect><rect fill="rgba(139, 0, 0, 0.05)" width="50" height="50" x="50" y="50"></rect></svg>');
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--dark-red), var(--black));
+            padding: 3rem 0;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 30px rgba(139, 0, 0, 0.5);
+            border-bottom: 3px solid var(--blood-red);
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="none" stroke="rgba(255,51,51,0.1)" stroke-width="2" d="M0 0 L100 100 M100 0 L0 100"></path></svg>');
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        header h1 {
+            font-size: 4rem;
+            color: var(--light-red);
+            text-shadow: 4px 4px 0 var(--dark-red);
+            margin-bottom: 1rem;
+            position: relative;
+            letter-spacing: 3px;
+            font-weight: 900;
+        }
+
+        header p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            font-style: italic;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: var(--dark-gray);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 2px solid var(--blood-red);
+            margin-bottom: 3rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            height: 25px;
+            background: var(--black);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--dark-red), var(--light-red));
+            width: 0%;
+            transition: width 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .challenge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+        }
+
+        .challenge-card {
+            background: var(--dark-gray);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            position: relative;
+            border: 2px solid var(--gray);
+            width: 100%;
+            max-width: 800px;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .challenge-card.active {
+            display: block;
+            animation: cardAppear 0.7s ease forwards;
+        }
+
+        @keyframes cardAppear {
+            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .challenge-card.completed {
+            border-left: 6px solid #2E8B57;
+        }
+
+        .challenge-header {
+            padding: 2rem;
+            background: linear-gradient(to right, var(--dark-red), var(--black));
+            color: white;
+            position: relative;
+            border-bottom: 2px solid var(--blood-red);
+        }
+
+        .challenge-header h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .difficulty-label {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .easy { background-color: rgba(46, 139, 87, 0.3); color: #7CFC00; border-color: #7CFC00; }
+        .medium { background-color: rgba(255, 165, 0, 0.3); color: #FFA500; border-color: #FFA500; }
+        .hard { background-color: rgba(139, 0, 0, 0.3); color: var(--light-red); border-color: var(--light-red); }
+        .expert { background-color: rgba(128, 0, 128, 0.3); color: #DA70D6; border-color: #DA70D6; }
+        .nightmare { background-color: rgba(0, 0, 0, 0.5); color: white; border-color: var(--blood-red); text-shadow: 0 0 5px var(--light-red); }
+
+        .challenge-body {
+            padding: 2rem;
+        }
+
+        .challenge-body p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .challenge-image {
+            width: 100%;
+            height: 200px;
+            background-color: var(--black);
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--gray);
+            position: relative;
+        }
+
+        .challenge-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .challenge-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(139,0,0,0.1), rgba(0,0,0,0.7));
+        }
+
+        .challenge-question {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--blood-red);
+            margin-bottom: 1.5rem;
+        }
+
+        .challenge-question h4 {
+            color: var(--light-red);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            background: var(--black);
+            color: var(--light-gray);
+            border: 1px solid var(--gray);
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .option-btn:hover {
+            border-color: var(--light-red);
+            transform: translateX(5px);
+        }
+
+        .option-btn.selected {
+            background: rgba(139, 0, 0, 0.3);
+            border-color: var(--light-red);
+            color: white;
+        }
+
+        .option-btn.correct {
+            background: rgba(46, 139, 87, 0.3);
+            border-color: #7CFC00;
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(139, 0, 0, 0.3);
+            border-color: var(--light-red);
+            color: white;
+            opacity: 0.7;
+        }
+
+        .challenge-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .challenge-btn {
+            background: var(--blood-red);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(139, 0, 0, 0.3);
+        }
+
+        .challenge-btn:hover {
+            background: var(--light-red);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(139, 0, 0, 0.4);
+        }
+
+        .challenge-btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .hint-text {
+            color: var(--light-gray);
+            font-style: italic;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            display: none;
+        }
+
+        .show-hint {
+            background: transparent;
+            color: var(--light-red);
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        .completion-message {
+            text-align: center;
+            margin: 4rem 0;
+            font-size: 2rem;
+            color: var(--light-red);
+            display: none;
+            text-shadow: 2px 2px 0 var(--dark-red);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .apology-section {
+            margin-top: 5rem;
+            padding: 4rem;
+            background: linear-gradient(135deg, var(--black), var(--dark-red));
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--blood-red);
+            display: none;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .apology-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="rgba(255,51,51,0.05)" d="M0 0 L100 100 M100 0 L0 100"></path></svg>');
+            opacity: 0.5;
+            z-index: 0;
+            animation: rotate 60s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .apology-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .apology-section h2 {
+            font-size: 3rem;
+            color: var(--light-red);
+            margin-bottom: 2rem;
+            text-shadow: 3px 3px 0 var(--dark-red);
+            letter-spacing: 2px;
+        }
+
+        .apology-section p {
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+
+        .apology-input {
+            margin: 3rem auto;
+            max-width: 600px;
+        }
+
+        .apology-input input {
+            width: 100%;
+            padding: 1.2rem;
+            border: 3px solid var(--blood-red);
+            border-radius: 50px;
+            background: var(--dark-gray);
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .apology-input input:focus {
+            border-color: var(--light-red);
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.7);
+        }
+
+        .comment-section {
+            margin-top: 4rem;
+            padding: 3rem;
+            background: var(--dark-gray);
+            border-radius: 15px;
+            border: 2px solid var(--gray);
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .comment-section h3 {
+            font-size: 2rem;
+            color: var(--light-red);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 2px 2px 0 var(--dark-red);
+        }
+
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            padding: 1.5rem;
+            border: 2px solid var(--blood-red);
+            border-radius: 15px;
+            background: var(--black);
+            color: white;
+            font-size: 1.1rem;
+            min-height: 200px;
+            resize: vertical;
+            outline: none;
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .comment-form textarea:focus {
+            border-color: var(--light-red);
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+        }
+
+        .comment-form button {
+            align-self: center;
+            background: var(--blood-red);
+            color: white;
+            border: none;
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
+        }
+
+        .comment-form button:hover {
+            background: var(--light-red);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.4);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            color: var(--light-red);
+            margin-top: 1rem;
+            font-size: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: #7CFC00;
+            margin-top: 1.5rem;
+            font-size: 1.3rem;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(124, 252, 0, 0.3);
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--light-red);
+            opacity: 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem;
+            margin-top: 5rem;
+            background: linear-gradient(to right, var(--black), var(--dark-red), var(--black));
+            color: var(--light-gray);
+            font-size: 1rem;
+            border-top: 2px solid var(--blood-red);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .challenge-card, .apology-section, .comment-section {
+                padding: 1.5rem;
+            }
+
+            .apology-section h2 {
+                font-size: 2rem;
+            }
+
+            .completion-message {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="celebration" id="celebration"></div>
+
+    <header>
+        <h1>The Crimson Trials</h1>
+        <p>Test your knowledge and skills across diverse challenges. Only the worthy shall prevail.</p>
+    </header>
+
+    <div class="container">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Trial 1 of 10</div>
+        </div>
+
+        <div class="challenge-container" id="challengeContainer">
+            <!-- Challenge 1 -->
+            <div class="challenge-card active" data-challenge="1" data-difficulty="easy">
+                <div class="challenge-header">
+                    <span class="difficulty-label easy">Easy</span>
+                    <h3>World Capitals</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="World map">
+                    </div>
+                    <p>Identify the capital cities of these countries. A strong foundation in geography is essential for any adventurer.</p>
+                    
+                    <div class="challenge-question">
+                        <h4>What is the capital of Japan?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">Osaka</button>
+                            <button class="option-btn" data-correct="false">Kyoto</button>
+                            <button class="option-btn" data-correct="true">Tokyo</button>
+                            <button class="option-btn" data-correct="false">Seoul</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">This city hosted the 2020 Summer Olympics.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit1">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 2 -->
+            <div class="challenge-card" data-challenge="2" data-difficulty="easy">
+                <div class="challenge-header">
+                    <span class="difficulty-label easy">Easy</span>
+                    <h3>Famous Paintings</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Art museum">
+                    </div>
+                    <p>Recognize these iconic works of art. Cultural literacy separates the civilized from the barbarians.</p>
+                    
+                    <div class="challenge-question">
+                        <h4>Who painted "The Starry Night"?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">Pablo Picasso</button>
+                            <button class="option-btn" data-correct="true">Vincent van Gogh</button>
+                            <button class="option-btn" data-correct="false">Claude Monet</button>
+                            <button class="option-btn" data-correct="false">Salvador Dalí</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">This Dutch painter famously cut off part of his own ear.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit2">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 3 -->
+            <div class="challenge-card" data-challenge="3" data-difficulty="medium">
+                <div class="challenge-header">
+                    <span class="difficulty-label medium">Medium</span>
+                    <h3>Classical Music</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Classical music">
+                    </div>
+                    <p>Identify these timeless compositions. The masters speak through their works - can you hear them?</p>
+                    
+                    <div class="challenge-question">
+                        <h4>Which composer wrote "Symphony No. 5"?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">Wolfgang Amadeus Mozart</button>
+                            <button class="option-btn" data-correct="true">Ludwig van Beethoven</button>
+                            <button class="option-btn" data-correct="false">Johann Sebastian Bach</button>
+                            <button class="option-btn" data-correct="false">Pyotr Ilyich Tchaikovsky</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">This symphony begins with the famous "fate knocking at the door" motif.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit3">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 4 -->
+            <div class="challenge-card" data-challenge="4" data-difficulty="medium">
+                <div class="challenge-header">
+                    <span class="difficulty-label medium">Medium</span>
+                    <h3>Scientific Discoveries</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Science lab">
+                    </div>
+                    <p>Match these groundbreaking discoveries to their discoverers. Science lights the path to truth.</p>
+                    
+                    <div class="challenge-question">
+                        <h4>Who formulated the theory of relativity?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">Isaac Newton</button>
+                            <button class="option-btn" data-correct="false">Niels Bohr</button>
+                            <button class="option-btn" data-correct="true">Albert Einstein</button>
+                            <button class="option-btn" data-correct="false">Stephen Hawking</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">This physicist famously stuck out his tongue in a iconic photograph.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit4">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 5 -->
+            <div class="challenge-card" data-challenge="5" data-difficulty="hard">
+                <div class="challenge-header">
+                    <span class="difficulty-label hard">Hard</span>
+                    <h3>Ancient History</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Ancient ruins">
+                    </div>
+                    <p>Answer these questions about ancient civilizations. Those who forget history are doomed to repeat it.</p>
+                    
+                    <div class="challenge-question">
+                        <h4>Which ancient civilization built the pyramids of Giza?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">The Romans</button>
+                            <button class="option-btn" data-correct="false">The Greeks</button>
+                            <button class="option-btn" data-correct="true">The Egyptians</button>
+                            <button class="option-btn" data-correct="false">The Mesopotamians</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">This civilization flourished along the Nile River.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit5">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 6 -->
+            <div class="challenge-card" data-challenge="6" data-difficulty="hard">
+                <div class="challenge-header">
+                    <span class="difficulty-label hard">Hard</span>
+                    <h3>Literary Classics</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Books">
+                    </div>
+                    <p>Identify these classic works of literature. Great books are the mirrors of the soul.</p>
+                    
+                    <div class="challenge-question">
+                        <h4>Who wrote "Pride and Prejudice"?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">Charlotte Brontë</button>
+                            <button class="option-btn" data-correct="false">Emily Brontë</button>
+                            <button class="option-btn" data-correct="true">Jane Austen</button>
+                            <button class="option-btn" data-correct="false">Mary Shelley</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">This author's works often critique the British landed gentry.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit6">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 7 -->
+            <div class="challenge-card" data-challenge="7" data-difficulty="expert">
+                <div class="challenge-header">
+                    <span class="difficulty-label expert">Expert</span>
+                    <h3>Astronomy</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Galaxy">
+                    </div>
+                    <p>Answer these cosmic questions. The universe reveals its secrets to those who dare to look.</p>
+                    
+                    <div class="challenge-question">
+                        <h4>Which planet is known as the "Red Planet"?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">Jupiter</button>
+                            <button class="option-btn" data-correct="false">Venus</button>
+                            <button class="option-btn" data-correct="true">Mars</button>
+                            <button class="option-btn" data-correct="false">Saturn</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">NASA's Perseverance rover is currently exploring this planet.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit7">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 8 -->
+            <div class="challenge-card" data-challenge="8" data-difficulty="expert">
+                <div class="challenge-header">
+                    <span class="difficulty-label expert">Expert</span>
+                    <h3>Human Anatomy</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Anatomy model">
+                    </div>
+                    <p>Test your knowledge of the human body. Know thyself - the oldest imperative.</p>
+                    
+                    <div class="challenge-question">
+                        <h4>What is the largest organ in the human body?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">Liver</button>
+                            <button class="option-btn" data-correct="false">Brain</button>
+                            <button class="option-btn" data-correct="true">Skin</button>
+                            <button class="option-btn" data-correct="false">Heart</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">This organ protects your body from external threats and regulates temperature.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit8">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 9 -->
+            <div class="challenge-card" data-challenge="9" data-difficulty="nightmare">
+                <div class="challenge-header">
+                    <span class="difficulty-label nightmare">Nightmare</span>
+                    <h3>Cryptic Riddles</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1518655048521-f130df041f66?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Mysterious fog">
+                    </div>
+                    <p>Solve these enigmatic puzzles. The truth often hides in plain sight.</p>
+                    
+                    <div class="challenge-question">
+                        <h4>I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">A shadow</button>
+                            <button class="option-btn" data-correct="false">A cloud</button>
+                            <button class="option-btn" data-correct="true">An echo</button>
+                            <button class="option-btn" data-correct="false">A kite</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">You'll often find me in mountains or empty hallways.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit9">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 10 -->
+            <div class="challenge-card" data-challenge="10" data-difficulty="nightmare">
+                <div class="challenge-header">
+                    <span class="difficulty-label nightmare">Nightmare</span>
+                    <h3>Final Judgment</h3>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-image">
+                        <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Mountain peak">
+                    </div>
+                    <p>The ultimate test of your knowledge and wisdom. Prove yourself worthy.</p>
+                    
+                    <div class="challenge-question">
+                        <h4>Which of these elements is NOT one of the four classical elements?</h4>
+                        <div class="options-container">
+                            <button class="option-btn" data-correct="false">Earth</button>
+                            <button class="option-btn" data-correct="false">Air</button>
+                            <button class="option-btn" data-correct="false">Fire</button>
+                            <button class="option-btn" data-correct="true">Metal</button>
+                        </div>
+                    </div>
+                    
+                    <button class="show-hint">Show Hint</button>
+                    <div class="hint-text">These elements were first proposed by ancient Greek philosophers.</div>
+                    
+                    <div class="challenge-buttons">
+                        <button class="challenge-btn" id="submit10">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="completion-message" id="completionMessage">
+            TRIALS COMPLETED. SCROLL DOWN FOR YOUR REWARD.
+        </div>
+
+        <div class="apology-section" id="apologySection">
+            <div class="apology-content">
+                <h2>MY DEEPEST APOLOGIES</h2>
+                <p>Through these trials, you've proven your worth. Now, I must confess my transgressions. My actions were thoughtless, my words careless. I stand before you humbled by your perseverance. Please find it in your heart to forgive me.</p>
+                
+                <div class="apology-input">
+                    <input type="text" id="apologyResponse" placeholder="Type 'yes' to accept my contrition">
+                    <div id="errorMessage" class="error-message hidden">Only 'yes' will suffice as absolution.</div>
+                    <div id="successMessage" class="success-message hidden">Your mercy shines brighter than a thousand suns. Thank you.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comment-section" id="commentSection">
+            <h3>RECORD YOUR THOUGHTS</h3>
+            <form class="comment-form">
+                <textarea placeholder="Inscribe your wisdom here..."></textarea>
+                <button type="submit">Seal Your Words</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 THE CRIMSON TRIALS. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const challenges = document.querySelectorAll('.challenge-card');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const completionMessage = document.getElementById('completionMessage');
+            const apologySection = document.getElementById('apologySection');
+            const commentSection = document.getElementById('commentSection');
+            const celebration = document.getElementById('celebration');
+            
+            let currentChallenge = 1;
+            const totalChallenges = challenges.length;
+            
+            // Initialize the first challenge
+            updateProgress();
+            
+            // Set up option buttons for each challenge
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove selected class from all options in this question
+                    this.parentNode.querySelectorAll('.option-btn').forEach(option => {
+                        option.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    
+                    // Enable submit button
+                    const challengeNum = this.closest('.challenge-card').dataset.challenge;
+                    document.getElementById(`submit${challengeNum}`).disabled = false;
+                });
+            });
+            
+            // Set up hint toggles
+            document.querySelectorAll('.show-hint').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const hint = this.nextElementSibling;
+                    hint.style.display = hint.style.display === 'block' ? 'none' : 'block';
+                    this.textContent = hint.style.display === 'block' ? 'Hide Hint' : 'Show Hint';
+                });
+            });
+            
+            // Set up submit buttons for each challenge
+            for (let i = 1; i <= totalChallenges; i++) {
+                const submitBtn = document.getElementById(`submit${i}`);
+                const options = document.querySelectorAll(`.challenge-card[data-challenge="${i}"] .option-btn`);
+                
+                submitBtn.addEventListener('click', function() {
+                    const selectedOption = document.querySelector(`.challenge-card[data-challenge="${i}"] .option-btn.selected`);
+                    
+                    if (!selectedOption) {
+                        alert('Please select an answer before submitting.');
+                        return;
+                    }
+                    
+                    // Show correct/incorrect answers
+                    options.forEach(option => {
+                        if (option.dataset.correct === "true") {
+                            option.classList.add('correct');
+                        } else if (option.classList.contains('selected') && option.dataset.correct === "false") {
+                            option.classList.add('incorrect');
+                        }
+                    });
+                    
+                    // Check if answer is correct
+                    if (selectedOption.dataset.correct === "true") {
+                        // Mark challenge as completed
+                        const currentCard = document.querySelector(`.challenge-card[data-challenge="${i}"]`);
+                        currentCard.classList.add('completed');
+                        
+                        // Move to next challenge or show completion message
+                        if (i < totalChallenges) {
+                            currentChallenge = i + 1;
+                            setTimeout(() => {
+                                showChallenge(currentChallenge);
+                            }, 1500);
+                        } else {
+                            // All challenges completed
+                            setTimeout(() => {
+                                completionMessage.style.display = 'block';
+                                apologySection.style.display = 'block';
+                                commentSection.style.display = 'block';
+                                createConfetti();
+                            }, 1500);
+                        }
+                        
+                        updateProgress();
+                    } else {
+                        alert('Incorrect answer. The trial continues...');
+                    }
+                });
+            }
+            
+            function showChallenge(num) {
+                challenges.forEach(challenge => {
+                    challenge.classList.remove('active');
+                });
+                
+                const nextChallenge = document.querySelector(`.challenge-card[data-challenge="${num}"]`);
+                nextChallenge.classList.add('active');
+                
+                // Scroll to the next challenge
+                setTimeout(() => {
+                    nextChallenge.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+            
+            function updateProgress() {
+                const progressPercent = ((currentChallenge - 1) / totalChallenges) * 100;
+                progressFill.style.width = `${progressPercent}%`;
+                progressText.textContent = `TRIAL ${currentChallenge} OF ${totalChallenges}`;
+            }
+            
+            function createConfetti() {
+                celebration.style.display = 'block';
+                
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    
+                    // Random color
+                    const colors = ['#8B0000', '#FF3333', '#5E0000', '#7CFC00', '#FFA500', '#DA70D6'];
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.backgroundColor = randomColor;
+                    
+                    // Random position and size
+                    confetti.style.left = `${Math.random() * 100}%`;
+                    confetti.style.width = `${Math.random() * 10 + 5}px`;
+                    confetti.style.height = `${Math.random() * 10 + 5}px`;
+                    
+                    // Animation
+                    const animationDuration = Math.random() * 3 + 2;
+                    confetti.style.animation = `fall ${animationDuration}s linear forwards`;
+                    
+                    // Add keyframes for falling animation
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        @keyframes fall {
+                            0% {
+                                transform: translateY(-100vh) rotate(0deg);
+                                opacity: 1;
+                            }
+                            100% {
+                                transform: translateY(100vh) rotate(360deg);
+                                opacity: 0;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    celebration.appendChild(confetti);
+                    
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, animationDuration * 1000);
+                }
+                
+                // Keep adding confetti every 300ms for 3 seconds
+                const confettiInterval = setInterval(() => {
+                    createConfetti();
+                }, 300);
+                
+                setTimeout(() => {
+                    clearInterval(confettiInterval);
+                }, 3000);
+            }
+            
+            // Apology response validation
+            const apologyInput = document.getElementById('apologyResponse');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            apologyInput.addEventListener('input', function() {
+                if (this.value.toLowerCase() === 'yes') {
+                    errorMessage.classList.add('hidden');
+                    successMessage.classList.remove('hidden');
+                    this.style.borderColor = '#7CFC00';
+                    this.style.boxShadow = '0 0 20px rgba(124, 252, 0, 0.7)';
+                    createConfetti();
+                } else {
+                    successMessage.classList.add('hidden');
+                    if (this.value.trim() !== '') {
+                        errorMessage.classList.remove('hidden');
+                        this.style.borderColor = 'var(--light-red)';
+                    } else {
+                        errorMessage.classList.add('hidden');
+                        this.style.borderColor = 'var(--blood-red)';
+                    }
+                }
+            });
+            
+            // Comment form submission
+            document.querySelector('.comment-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const comment = this.querySelector('textarea').value;
+                if (comment.trim() !== '') {
+                    alert('Your words have been recorded in the annals of history.');
+                    this.querySelector('textarea').value = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
